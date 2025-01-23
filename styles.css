@@ -244,4 +244,29 @@ button:hover {
 
 .small-button.danger:hover {
     background-color: #c82333;
+}
+
+/* Add styles for keywords input */
+.keywords-input {
+    margin-bottom: 15px;
+}
+
+.keywords-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.keywords-input input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.keywords-input input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
 } 

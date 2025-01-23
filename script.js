@@ -47,6 +47,9 @@ class TextOptimizer {
         this.connectionStatus = document.getElementById('connectionStatus');
         this.currentProvider = document.getElementById('currentProvider');
         this.removeConfigBtn = document.getElementById('removeConfig');
+
+        // Add target keywords input element
+        this.targetKeywords = document.getElementById('targetKeywords');
     }
 
     addEventListeners() {
@@ -164,29 +167,35 @@ class TextOptimizer {
 
     async analyzeSEO(text, apiKey) {
         const provider = localStorage.getItem('aiProvider') || 'openai';
-        const endpoint = this.apiEndpoints[provider];
+        let endpoint = this.apiEndpoints[provider];
         
         const headers = {
             'Content-Type': 'application/json'
         };
 
+        // Get and process target keywords
+        const keywords = this.targetKeywords.value.trim()
+            ? this.targetKeywords.value.split(',').map(k => k.trim()).join(', ')
+            : 'no specific keywords provided';
+
         let body;
-        const prompt = `Analyze this text for SEO optimization and provide specific suggestions.
-Format your response with clear sections using markdown-style formatting:
+        const prompt = `Analyze the following content for SEO effectiveness and provide actionable recommendations. Focus on:
 
-### Keywords
-- List key terms and phrases
-- Suggest additional relevant keywords
+Keyword Optimization: Identify if primary/secondary keywords (e.g., ${keywords}) are used effectively. Check density, placement (title, headers, body), and semantic relevance.
 
-### Content Structure
-- Analyze headings and structure
-- Suggest improvements
+Readability: Assess content structure, sentence length, paragraph breaks, and use of subheadings (H2, H3).
 
-### Recommendations
-- Provide specific optimization suggestions
-- Include actionable improvements
+Meta Elements: Suggest improvements for meta titles, descriptions, and alt text for images.
 
-Text to analyze: ${text}`;
+Content Quality: Evaluate uniqueness, depth, and relevance to search intent. Does it answer user queries better than competitors?
+
+Internal/External Linking: Check for opportunities to add authoritative external links or internal links to related content.
+
+Technical SEO: Highlight potential issues like duplicate content, missing headers, or mobile-friendliness (if detectable).
+
+Competitor Comparison: How does this content compare to top-ranking pages for the target keywords?
+
+Content to analyze: ${text}`;
         
         switch(provider) {
             case 'openai':
@@ -201,7 +210,7 @@ Text to analyze: ${text}`;
                 break;
                 
             case 'gemini':
-                const geminiEndpoint = `${endpoint}?key=${apiKey}`;
+                endpoint = `${endpoint}?key=${apiKey}`;
                 body = {
                     contents: [{
                         parts: [{
@@ -209,7 +218,6 @@ Text to analyze: ${text}`;
                         }]
                     }]
                 };
-                endpoint = geminiEndpoint;
                 break;
                 
             case 'deepseek':
