@@ -11,38 +11,46 @@
         <header>
             <h1>SEO & Language Optimizer</h1>
             <nav>
-                <a href="#" class="active" id="mainLink">Main</a>
+                <a href="#" class="active" id="seoLink">SEO Optimization</a>
+                <a href="#" id="languageLink">Natural Language</a>
                 <a href="#" id="configLink">Configuration</a>
             </nav>
         </header>
 
-        <!-- Main Interface -->
-        <div id="mainInterface" class="section">
+        <!-- SEO Interface -->
+        <div id="seoInterface" class="section">
             <div class="input-section">
-                <h2>Input Text</h2>
-                <textarea id="inputText" placeholder="Enter or paste your text here..."></textarea>
+                <h2>Input Text for SEO Analysis</h2>
+                <textarea id="seoInputText" placeholder="Enter or paste your text here..."></textarea>
                 <div class="buttons">
-                    <button id="pasteBtn">Paste from Clipboard</button>
-                    <button id="analyzeBtn">Analyze Text</button>
+                    <button id="seoPasteBtn">Paste from Clipboard</button>
+                    <button id="seoAnalyzeBtn">Analyze SEO</button>
                 </div>
             </div>
 
             <div class="results-section">
-                <div class="suggestions">
-                    <div class="seo-suggestions">
-                        <h2>SEO Suggestions</h2>
-                        <div id="seoSuggestions"></div>
-                    </div>
-                    <div class="language-suggestions">
-                        <h2>Natural Language Improvements</h2>
-                        <div id="languageSuggestions"></div>
-                    </div>
+                <div class="seo-suggestions">
+                    <h2>SEO Suggestions</h2>
+                    <div id="seoSuggestions"></div>
                 </div>
-                
-                <div class="output-section">
-                    <h2>Optimized Text</h2>
-                    <textarea id="outputText" readonly></textarea>
-                    <button id="copyBtn">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Natural Language Interface -->
+        <div id="languageInterface" class="section hidden">
+            <div class="input-section">
+                <h2>Input Text for Language Improvement</h2>
+                <textarea id="languageInputText" placeholder="Enter or paste your text here..."></textarea>
+                <div class="buttons">
+                    <button id="languagePasteBtn">Paste from Clipboard</button>
+                    <button id="languageAnalyzeBtn">Analyze Language</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="language-suggestions">
+                    <h2>Natural Language Improvements</h2>
+                    <div id="languageSuggestions"></div>
                 </div>
             </div>
         </div>
@@ -51,6 +59,15 @@
         <div id="configInterface" class="section hidden">
             <h2>API Configuration</h2>
             <div class="config-form">
+                <div class="current-provider">
+                    <div class="provider-info">
+                        Currently using: <span id="currentProvider">Not configured</span>
+                    </div>
+                    <div class="provider-actions">
+                        <button id="testConnection" class="small-button">Test Connection</button>
+                        <button id="removeConfig" class="small-button danger">Remove</button>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="aiProvider">AI Provider:</label>
                     <select id="aiProvider">
@@ -63,10 +80,7 @@
                     <label for="apiKey">API Key:</label>
                     <input type="password" id="apiKey" placeholder="Enter your API key">
                 </div>
-                <div class="button-group">
-                    <button id="saveConfig">Save Configuration</button>
-                    <button id="testConnection">Test Connection</button>
-                </div>
+                <button id="saveConfig">Save Configuration</button>
                 <div id="connectionStatus" class="connection-status"></div>
             </div>
         </div>

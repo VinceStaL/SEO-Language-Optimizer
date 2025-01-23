@@ -28,14 +28,17 @@ header h1 {
 
 nav {
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 nav a {
     text-decoration: none;
     color: #333;
     padding: 10px 20px;
-    margin: 0 10px;
     border-radius: 5px;
+    transition: all 0.3s ease;
 }
 
 nav a.active {
@@ -171,13 +174,7 @@ button:hover {
 }
 
 .button-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.button-group button {
-    flex: 1;
+    display: none;
 }
 
 .connection-status {
@@ -207,4 +204,44 @@ button:hover {
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
+}
+
+/* Update the current provider styles */
+.current-provider {
+    background-color: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.provider-info {
+    font-size: 14px;
+}
+
+.provider-info span {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.small-button {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin: 0;
+}
+
+.provider-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.small-button.danger {
+    background-color: #dc3545;
+}
+
+.small-button.danger:hover {
+    background-color: #c82333;
 } 

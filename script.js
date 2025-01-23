@@ -15,22 +15,28 @@ class TextOptimizer {
             deepseek: "Hello! This is a test message to verify the API connection."
         };
         this.encryptionKey = 'your-encryption-key'; // In production, this should be more secure
+        this.updateCurrentProviderDisplay();
     }
 
     initializeElements() {
         // Navigation elements
-        this.mainLink = document.getElementById('mainLink');
+        this.seoLink = document.getElementById('seoLink');
+        this.languageLink = document.getElementById('languageLink');
         this.configLink = document.getElementById('configLink');
-        this.mainInterface = document.getElementById('mainInterface');
+        this.seoInterface = document.getElementById('seoInterface');
+        this.languageInterface = document.getElementById('languageInterface');
         this.configInterface = document.getElementById('configInterface');
 
-        // Main interface elements
-        this.inputText = document.getElementById('inputText');
-        this.outputText = document.getElementById('outputText');
-        this.pasteBtn = document.getElementById('pasteBtn');
-        this.analyzeBtn = document.getElementById('analyzeBtn');
-        this.copyBtn = document.getElementById('copyBtn');
+        // SEO interface elements
+        this.seoInputText = document.getElementById('seoInputText');
+        this.seoPasteBtn = document.getElementById('seoPasteBtn');
+        this.seoAnalyzeBtn = document.getElementById('seoAnalyzeBtn');
         this.seoSuggestions = document.getElementById('seoSuggestions');
+
+        // Language interface elements
+        this.languageInputText = document.getElementById('languageInputText');
+        this.languagePasteBtn = document.getElementById('languagePasteBtn');
+        this.languageAnalyzeBtn = document.getElementById('languageAnalyzeBtn');
         this.languageSuggestions = document.getElementById('languageSuggestions');
 
         // Configuration elements
@@ -39,49 +45,74 @@ class TextOptimizer {
         this.aiProviderSelect = document.getElementById('aiProvider');
         this.testConnectionBtn = document.getElementById('testConnection');
         this.connectionStatus = document.getElementById('connectionStatus');
+        this.currentProvider = document.getElementById('currentProvider');
+        this.removeConfigBtn = document.getElementById('removeConfig');
     }
 
     addEventListeners() {
         // Navigation
-        this.mainLink.addEventListener('click', (e) => this.handleNavigation(e, 'main'));
+        this.seoLink.addEventListener('click', (e) => this.handleNavigation(e, 'seo'));
+        this.languageLink.addEventListener('click', (e) => this.handleNavigation(e, 'language'));
         this.configLink.addEventListener('click', (e) => this.handleNavigation(e, 'config'));
 
-        // Main functionality
-        this.pasteBtn.addEventListener('click', () => this.pasteFromClipboard());
-        this.analyzeBtn.addEventListener('click', () => this.analyzeText());
-        this.copyBtn.addEventListener('click', () => this.copyToClipboard());
+        // SEO functionality
+        this.seoPasteBtn.addEventListener('click', () => this.handlePaste('seo'));
+        this.seoAnalyzeBtn.addEventListener('click', () => this.analyzeSEOText());
+
+        // Language functionality
+        this.languagePasteBtn.addEventListener('click', () => this.handlePaste('language'));
+        this.languageAnalyzeBtn.addEventListener('click', () => this.analyzeLanguageText());
 
         // Configuration
         this.saveConfigBtn.addEventListener('click', () => this.saveConfiguration());
         this.testConnectionBtn.addEventListener('click', () => this.testConnection());
+        this.removeConfigBtn.addEventListener('click', () => this.removeConfiguration());
     }
 
     handleNavigation(e, section) {
         e.preventDefault();
-        if (section === 'main') {
-            this.mainInterface.classList.remove('hidden');
-            this.configInterface.classList.add('hidden');
-            this.mainLink.classList.add('active');
-            this.configLink.classList.remove('active');
-            this.connectionStatus.className = 'connection-status';  // Hide status when switching to main
-        } else {
-            this.mainInterface.classList.add('hidden');
-            this.configInterface.classList.remove('hidden');
-            this.mainLink.classList.remove('active');
-            this.configLink.classList.add('active');
+        
+        // Hide all interfaces
+        this.seoInterface.classList.add('hidden');
+        this.languageInterface.classList.add('hidden');
+        this.configInterface.classList.add('hidden');
+
+        // Remove active class from all links
+        this.seoLink.classList.remove('active');
+        this.languageLink.classList.remove('active');
+        this.configLink.classList.remove('active');
+
+        // Show selected interface and activate corresponding link
+        switch(section) {
+            case 'seo':
+                this.seoInterface.classList.remove('hidden');
+                this.seoLink.classList.add('active');
+                break;
+            case 'language':
+                this.languageInterface.classList.remove('hidden');
+                this.languageLink.classList.add('active');
+                break;
+            case 'config':
+                this.configInterface.classList.remove('hidden');
+                this.configLink.classList.add('active');
+                break;
         }
     }
 
-    async pasteFromClipboard() {
+    async handlePaste(type) {
         try {
             const text = await navigator.clipboard.readText();
-            this.inputText.value = text;
+            if (type === 'seo') {
+                this.seoInputText.value = text;
+            } else {
+                this.languageInputText.value = text;
+            }
         } catch (err) {
             alert('Failed to read from clipboard. Please paste manually.');
         }
     }
 
-    async analyzeText() {
+    async analyzeSEOText() {
         const encryptedApiKey = localStorage.getItem('apiKey');
         if (!encryptedApiKey) {
             alert('Please configure your API key first');
@@ -89,7 +120,7 @@ class TextOptimizer {
         }
 
         const apiKey = this.decrypt(encryptedApiKey);
-        const text = this.inputText.value.trim();
+        const text = this.seoInputText.value.trim();
         if (!text) {
             alert('Please enter some text to analyze');
             return;
@@ -97,12 +128,33 @@ class TextOptimizer {
 
         try {
             this.setLoading(true);
-            const [seoResults, languageResults] = await Promise.all([
-                this.analyzeSEO(text, apiKey),
-                this.analyzeLanguage(text, apiKey)
-            ]);
+            const seoResults = await this.analyzeSEO(text, apiKey);
+            this.displaySEOSuggestions(seoResults);
+        } catch (error) {
+            alert('Error analyzing text: ' + error.message);
+        } finally {
+            this.setLoading(false);
+        }
+    }
 
-            this.displayResults(seoResults, languageResults);
+    async analyzeLanguageText() {
+        const encryptedApiKey = localStorage.getItem('apiKey');
+        if (!encryptedApiKey) {
+            alert('Please configure your API key first');
+            return;
+        }
+
+        const apiKey = this.decrypt(encryptedApiKey);
+        const text = this.languageInputText.value.trim();
+        if (!text) {
+            alert('Please enter some text to analyze');
+            return;
+        }
+
+        try {
+            this.setLoading(true);
+            const languageResults = await this.analyzeLanguage(text, apiKey);
+            this.displayLanguageSuggestions(languageResults);
         } catch (error) {
             alert('Error analyzing text: ' + error.message);
         } finally {
@@ -195,9 +247,7 @@ Text to analyze: ${text}`;
 
     async analyzeLanguage(text, apiKey) {
         const provider = localStorage.getItem('aiProvider') || 'openai';
-        const endpoint = provider === 'claude' ? 
-            this.corsProxy + this.apiEndpoints[provider] : 
-            this.apiEndpoints[provider];
+        let endpoint = this.apiEndpoints[provider];  // Change const to let
         
         const headers = {
             'Content-Type': 'application/json'
@@ -236,7 +286,7 @@ Text to analyze: ${text}`
                 break;
                 
             case 'gemini':
-                const geminiEndpoint = `${endpoint}?key=${apiKey}`;
+                endpoint = `${endpoint}?key=${apiKey}`;  // Now we can modify endpoint
                 body = {
                     contents: [{
                         parts: [{
@@ -262,7 +312,6 @@ Text to analyze: ${text}`
                         }]
                     }]
                 };
-                endpoint = geminiEndpoint;
                 break;
                 
             case 'deepseek':
@@ -316,11 +365,16 @@ Text to analyze: ${text}`
         }
     }
 
-    displayResults(seoResults, languageResults) {
+    displaySEOSuggestions(seoResults) {
         // Format and display SEO suggestions
         const formattedSeoResults = this.formatSuggestions(seoResults);
         this.seoSuggestions.innerHTML = `<div class="suggestion-content">${formattedSeoResults}</div>`;
         
+        // Generate optimized text based on suggestions
+        this.generateOptimizedText();
+    }
+
+    displayLanguageSuggestions(languageResults) {
         // Format and display language suggestions
         const formattedLanguageResults = this.formatSuggestions(languageResults);
         this.languageSuggestions.innerHTML = `<div class="suggestion-content">${formattedLanguageResults}</div>`;
@@ -332,12 +386,14 @@ Text to analyze: ${text}`
     generateOptimizedText() {
         // In a real implementation, this would apply the suggestions to the original text
         // For now, we'll just copy the original text
-        this.outputText.value = this.inputText.value;
+        this.seoInputText.value = this.seoInputText.value;
+        this.languageInputText.value = this.languageInputText.value;
     }
 
     async copyToClipboard() {
         try {
-            await navigator.clipboard.writeText(this.outputText.value);
+            await navigator.clipboard.writeText(this.seoInputText.value);
+            await navigator.clipboard.writeText(this.languageInputText.value);
             alert('Text copied to clipboard!');
         } catch (err) {
             alert('Failed to copy text to clipboard');
@@ -353,9 +409,9 @@ Text to analyze: ${text}`
             return;
         }
 
-        // Encrypt API key before storing
         localStorage.setItem('apiKey', this.encrypt(apiKey));
         localStorage.setItem('aiProvider', provider);
+        this.updateCurrentProviderDisplay();
         alert('Configuration saved successfully!');
     }
 
@@ -369,20 +425,29 @@ Text to analyze: ${text}`
         
         if (provider) {
             this.aiProviderSelect.value = provider;
+            this.updateCurrentProviderDisplay();
         }
     }
 
     setLoading(isLoading) {
-        this.analyzeBtn.disabled = isLoading;
-        this.analyzeBtn.textContent = isLoading ? 'Analyzing...' : 'Analyze Text';
+        this.seoAnalyzeBtn.disabled = isLoading;
+        this.seoAnalyzeBtn.textContent = isLoading ? 'Analyzing...' : 'Analyze Text';
+        this.languageAnalyzeBtn.disabled = isLoading;
+        this.languageAnalyzeBtn.textContent = isLoading ? 'Analyzing...' : 'Analyze Text';
     }
 
     async testConnection() {
-        const apiKey = this.apiKeyInput.value.trim();
+        // Get the stored API key first
+        const encryptedApiKey = localStorage.getItem('apiKey');
         const provider = this.aiProviderSelect.value;
 
+        // If no stored key, then check input field
+        const apiKey = encryptedApiKey ? 
+            this.decrypt(encryptedApiKey) : 
+            this.apiKeyInput.value.trim();
+
         if (!apiKey) {
-            this.showConnectionStatus('error', 'Please enter an API key first');
+            this.showConnectionStatus('error', 'No API key found. Please enter an API key first');
             return;
         }
 
@@ -524,6 +589,31 @@ Text to analyze: ${text}`
         formatted = formatted.replace(/<div class="suggestion-section"><\/div>/g, '');
 
         return formatted;
+    }
+
+    updateCurrentProviderDisplay() {
+        const provider = localStorage.getItem('aiProvider');
+        if (provider) {
+            const providerNames = {
+                'openai': 'OpenAI',
+                'gemini': 'Google Gemini',
+                'deepseek': 'DeepSeek'
+            };
+            this.currentProvider.textContent = providerNames[provider];
+        } else {
+            this.currentProvider.textContent = 'Not configured';
+        }
+    }
+
+    removeConfiguration() {
+        if (confirm('Are you sure you want to remove the saved configuration?')) {
+            localStorage.removeItem('apiKey');
+            localStorage.removeItem('aiProvider');
+            this.apiKeyInput.value = '';
+            this.aiProviderSelect.value = 'openai'; // Reset to default
+            this.updateCurrentProviderDisplay();
+            alert('Configuration removed successfully!');
+        }
     }
 }
 
