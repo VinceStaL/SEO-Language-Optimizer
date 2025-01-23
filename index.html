@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO & Language Optimizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SEO & Language Optimizer</h1>
+            <nav>
+                <a href="#" class="active" id="mainLink">Main</a>
+                <a href="#" id="configLink">Configuration</a>
+            </nav>
+        </header>
+
+        <!-- Main Interface -->
+        <div id="mainInterface" class="section">
+            <div class="input-section">
+                <h2>Input Text</h2>
+                <textarea id="inputText" placeholder="Enter or paste your text here..."></textarea>
+                <div class="buttons">
+                    <button id="pasteBtn">Paste from Clipboard</button>
+                    <button id="analyzeBtn">Analyze Text</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="suggestions">
+                    <div class="seo-suggestions">
+                        <h2>SEO Suggestions</h2>
+                        <div id="seoSuggestions"></div>
+                    </div>
+                    <div class="language-suggestions">
+                        <h2>Language Neutralization Suggestions</h2>
+                        <div id="languageSuggestions"></div>
+                    </div>
+                </div>
+                
+                <div class="output-section">
+                    <h2>Optimized Text</h2>
+                    <textarea id="outputText" readonly></textarea>
+                    <button id="copyBtn">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Interface -->
+        <div id="configInterface" class="section hidden">
+            <h2>API Configuration</h2>
+            <div class="config-form">
+                <div class="form-group">
+                    <label for="aiProvider">AI Provider:</label>
+                    <select id="aiProvider">
+                        <option value="openai">OpenAI</option>
+                        <option value="claude">Claude</option>
+                        <option value="deepseek">DeepSeek</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="apiKey">API Key:</label>
+                    <input type="password" id="apiKey" placeholder="Enter your API key">
+                </div>
+                <div class="button-group">
+                    <button id="saveConfig">Save Configuration</button>
+                    <button id="testConnection">Test Connection</button>
+                </div>
+                <div id="connectionStatus" class="connection-status"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
