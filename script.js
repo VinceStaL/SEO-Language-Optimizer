@@ -3,7 +3,6 @@ class TextOptimizer {
         this.initializeElements();
         this.addEventListeners();
         this.loadApiKey();
-        this.corsProxy = 'https://cors-anywhere.herokuapp.com/';  // Add CORS proxy
         this.apiEndpoints = {
             openai: 'https://api.openai.com/v1/chat/completions',
             gemini: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
@@ -32,6 +31,7 @@ class TextOptimizer {
         this.seoPasteBtn = document.getElementById('seoPasteBtn');
         this.seoAnalyzeBtn = document.getElementById('seoAnalyzeBtn');
         this.seoSuggestions = document.getElementById('seoSuggestions');
+        this.targetKeywords = document.getElementById('targetKeywords');
 
         // Language interface elements
         this.languageInputText = document.getElementById('languageInputText');
@@ -47,9 +47,6 @@ class TextOptimizer {
         this.connectionStatus = document.getElementById('connectionStatus');
         this.currentProvider = document.getElementById('currentProvider');
         this.removeConfigBtn = document.getElementById('removeConfig');
-
-        // Add target keywords input element
-        this.targetKeywords = document.getElementById('targetKeywords');
     }
 
     addEventListeners() {
@@ -377,35 +374,12 @@ Text to analyze: ${text}`
         // Format and display SEO suggestions
         const formattedSeoResults = this.formatSuggestions(seoResults);
         this.seoSuggestions.innerHTML = `<div class="suggestion-content">${formattedSeoResults}</div>`;
-        
-        // Generate optimized text based on suggestions
-        this.generateOptimizedText();
     }
 
     displayLanguageSuggestions(languageResults) {
         // Format and display language suggestions
         const formattedLanguageResults = this.formatSuggestions(languageResults);
         this.languageSuggestions.innerHTML = `<div class="suggestion-content">${formattedLanguageResults}</div>`;
-        
-        // Generate optimized text based on suggestions
-        this.generateOptimizedText();
-    }
-
-    generateOptimizedText() {
-        // In a real implementation, this would apply the suggestions to the original text
-        // For now, we'll just copy the original text
-        this.seoInputText.value = this.seoInputText.value;
-        this.languageInputText.value = this.languageInputText.value;
-    }
-
-    async copyToClipboard() {
-        try {
-            await navigator.clipboard.writeText(this.seoInputText.value);
-            await navigator.clipboard.writeText(this.languageInputText.value);
-            alert('Text copied to clipboard!');
-        } catch (err) {
-            alert('Failed to copy text to clipboard');
-        }
     }
 
     saveConfiguration() {

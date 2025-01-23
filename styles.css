@@ -91,7 +91,7 @@ button:hover {
 
 .suggestions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -269,4 +269,10 @@ button:hover {
     border-color: #007bff;
     outline: none;
     box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* Remove output-related styles */
+.output-section,
+.copy-btn {
+    display: none;
 } 
