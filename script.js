@@ -3,14 +3,15 @@ class TextOptimizer {
         this.initializeElements();
         this.addEventListeners();
         this.loadApiKey();
+        this.corsProxy = 'https://cors-anywhere.herokuapp.com/';  // Add CORS proxy
         this.apiEndpoints = {
             openai: 'https://api.openai.com/v1/chat/completions',
-            claude: 'https://api.anthropic.com/v1/messages',
+            gemini: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
             deepseek: 'https://api.deepseek.com/v1/chat/completions'
         };
         this.testMessages = {
             openai: "Hello! This is a test message to verify the API connection.",
-            claude: "Hello! This is a test message to verify the API connection.",
+            gemini: "Hello! This is a test message to verify the API connection.",
             deepseek: "Hello! This is a test message to verify the API connection."
         };
         this.encryptionKey = 'your-encryption-key'; // In production, this should be more secure
@@ -118,6 +119,22 @@ class TextOptimizer {
         };
 
         let body;
+        const prompt = `Analyze this text for SEO optimization and provide specific suggestions.
+Format your response with clear sections using markdown-style formatting:
+
+### Keywords
+- List key terms and phrases
+- Suggest additional relevant keywords
+
+### Content Structure
+- Analyze headings and structure
+- Suggest improvements
+
+### Recommendations
+- Provide specific optimization suggestions
+- Include actionable improvements
+
+Text to analyze: ${text}`;
         
         switch(provider) {
             case 'openai':
@@ -126,50 +143,21 @@ class TextOptimizer {
                     model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
-Format your response with clear sections using markdown-style formatting:
-
-### Keywords
-- List key terms and phrases
-- Suggest additional relevant keywords
-
-### Content Structure
-- Analyze headings and structure
-- Suggest improvements
-
-### Recommendations
-- Provide specific optimization suggestions
-- Include actionable improvements
-
-Text to analyze: ${text}`
+                        content: prompt
                     }]
                 };
                 break;
                 
-            case 'claude':
-                headers['x-api-key'] = apiKey;
+            case 'gemini':
+                const geminiEndpoint = `${endpoint}?key=${apiKey}`;
                 body = {
-                    model: "claude-3-sonnet-20240229",
-                    messages: [{
-                        role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
-Format your response with clear sections using markdown-style formatting:
-
-### Keywords
-- List key terms and phrases
-- Suggest additional relevant keywords
-
-### Content Structure
-- Analyze headings and structure
-- Suggest improvements
-
-### Recommendations
-- Provide specific optimization suggestions
-- Include actionable improvements
-
-Text to analyze: ${text}`
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
                     }]
                 };
+                endpoint = geminiEndpoint;
                 break;
                 
             case 'deepseek':
@@ -178,22 +166,7 @@ Text to analyze: ${text}`
                     model: "deepseek-chat",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
-Format your response with clear sections using markdown-style formatting:
-
-### Keywords
-- List key terms and phrases
-- Suggest additional relevant keywords
-
-### Content Structure
-- Analyze headings and structure
-- Suggest improvements
-
-### Recommendations
-- Provide specific optimization suggestions
-- Include actionable improvements
-
-Text to analyze: ${text}`
+                        content: prompt
                     }]
                 };
                 break;
@@ -211,8 +184,8 @@ Text to analyze: ${text}`
         switch(provider) {
             case 'openai':
                 return data.choices[0].message.content;
-            case 'claude':
-                return data.content[0].text;
+            case 'gemini':
+                return data.candidates[0].content.parts[0].text;
             case 'deepseek':
                 return data.choices[0].message.content;
             default:
@@ -222,7 +195,9 @@ Text to analyze: ${text}`
 
     async analyzeLanguage(text, apiKey) {
         const provider = localStorage.getItem('aiProvider') || 'openai';
-        const endpoint = this.apiEndpoints[provider];
+        const endpoint = provider === 'claude' ? 
+            this.corsProxy + this.apiEndpoints[provider] : 
+            this.apiEndpoints[provider];
         
         const headers = {
             'Content-Type': 'application/json'
@@ -237,50 +212,57 @@ Text to analyze: ${text}`
                     model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization.
+                        content: `Analyze this text and suggest improvements to make it sound more natural and human-like.
 Format your response with clear sections using markdown-style formatting:
 
-### Tone Analysis
-- Identify potentially biased language
-- Point out non-neutral expressions
+### Writing Style Analysis
+- Identify overly formal or robotic phrases
+- Point out mechanical or artificial-sounding expressions
+- Highlight repetitive or stilted language patterns
 
-### Suggested Improvements
-- Provide specific neutral alternatives
-- List recommended changes
+### Natural Alternatives
+- Provide conversational alternatives for formal phrases
+- Suggest more engaging ways to express the ideas
+- Offer human-like sentence variations
 
-### General Recommendations
-- Offer overall improvement suggestions
-- Include best practices
+### Flow Improvements
+- Recommend better transitions
+- Suggest ways to vary sentence structure
+- Provide tips for more natural rhythm and pacing
 
 Text to analyze: ${text}`
                     }]
                 };
                 break;
                 
-            case 'claude':
-                headers['x-api-key'] = apiKey;
+            case 'gemini':
+                const geminiEndpoint = `${endpoint}?key=${apiKey}`;
                 body = {
-                    model: "claude-3-sonnet-20240229",
-                    messages: [{
-                        role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization.
+                    contents: [{
+                        parts: [{
+                            text: `Analyze this text and suggest improvements to make it sound more natural and human-like.
 Format your response with clear sections using markdown-style formatting:
 
-### Tone Analysis
-- Identify potentially biased language
-- Point out non-neutral expressions
+### Writing Style Analysis
+- Identify overly formal or robotic phrases
+- Point out mechanical or artificial-sounding expressions
+- Highlight repetitive or stilted language patterns
 
-### Suggested Improvements
-- Provide specific neutral alternatives
-- List recommended changes
+### Natural Alternatives
+- Provide conversational alternatives for formal phrases
+- Suggest more engaging ways to express the ideas
+- Offer human-like sentence variations
 
-### General Recommendations
-- Offer overall improvement suggestions
-- Include best practices
+### Flow Improvements
+- Recommend better transitions
+- Suggest ways to vary sentence structure
+- Provide tips for more natural rhythm and pacing
 
 Text to analyze: ${text}`
+                        }]
                     }]
                 };
+                endpoint = geminiEndpoint;
                 break;
                 
             case 'deepseek':
@@ -289,20 +271,23 @@ Text to analyze: ${text}`
                     model: "deepseek-chat",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization.
+                        content: `Analyze this text and suggest improvements to make it sound more natural and human-like.
 Format your response with clear sections using markdown-style formatting:
 
-### Tone Analysis
-- Identify potentially biased language
-- Point out non-neutral expressions
+### Writing Style Analysis
+- Identify overly formal or robotic phrases
+- Point out mechanical or artificial-sounding expressions
+- Highlight repetitive or stilted language patterns
 
-### Suggested Improvements
-- Provide specific neutral alternatives
-- List recommended changes
+### Natural Alternatives
+- Provide conversational alternatives for formal phrases
+- Suggest more engaging ways to express the ideas
+- Offer human-like sentence variations
 
-### General Recommendations
-- Offer overall improvement suggestions
-- Include best practices
+### Flow Improvements
+- Recommend better transitions
+- Suggest ways to vary sentence structure
+- Provide tips for more natural rhythm and pacing
 
 Text to analyze: ${text}`
                     }]
@@ -322,8 +307,8 @@ Text to analyze: ${text}`
         switch(provider) {
             case 'openai':
                 return data.choices[0].message.content;
-            case 'claude':
-                return data.content[0].text;
+            case 'gemini':
+                return data.candidates[0].content.parts[0].text;
             case 'deepseek':
                 return data.choices[0].message.content;
             default:
@@ -417,12 +402,13 @@ Text to analyze: ${text}`
     }
 
     async makeTestRequest(provider, apiKey) {
-        const endpoint = this.apiEndpoints[provider];
+        let endpoint = this.apiEndpoints[provider];
         const headers = {
             'Content-Type': 'application/json'
         };
 
         let body;
+        let finalEndpoint = endpoint;  // Store the final endpoint to use
         
         switch(provider) {
             case 'openai':
@@ -436,13 +422,13 @@ Text to analyze: ${text}`
                 };
                 break;
                 
-            case 'claude':
-                headers['x-api-key'] = apiKey;
+            case 'gemini':
+                finalEndpoint = `${endpoint}?key=${apiKey}`;  // Update the final endpoint for Gemini
                 body = {
-                    model: "claude-3-sonnet-20240229",
-                    messages: [{
-                        role: "user",
-                        content: this.testMessages[provider]
+                    contents: [{
+                        parts: [{
+                            text: this.testMessages[provider]
+                        }]
                     }]
                 };
                 break;
@@ -459,18 +445,24 @@ Text to analyze: ${text}`
                 break;
         }
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(body)
-        });
+        try {
+            const response = await fetch(finalEndpoint, {  // Use finalEndpoint instead
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('API Error details:', error);
+            throw new Error(`API Error: ${error.message}`);
         }
-
-        const data = await response.json();
-        return data;
     }
 
     showConnectionStatus(type, message) {
