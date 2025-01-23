@@ -99,6 +99,44 @@ button:hover {
     border-radius: 4px;
 }
 
+.suggestion-content {
+    white-space: pre-line;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.suggestion-content ul, 
+.suggestion-content ol {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.suggestion-content li {
+    margin: 5px 0;
+}
+
+.suggestion-content h3 {
+    color: #2c3e50;
+    margin: 15px 0 10px 0;
+    font-size: 16px;
+}
+
+.suggestion-content p {
+    margin: 10px 0;
+}
+
+.suggestion-section {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.suggestion-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 .config-form {
     max-width: 500px;
     margin: 0 auto;

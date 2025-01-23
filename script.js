@@ -126,7 +126,22 @@ class TextOptimizer {
                     model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions: ${text}`
+                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
+Format your response with clear sections using markdown-style formatting:
+
+### Keywords
+- List key terms and phrases
+- Suggest additional relevant keywords
+
+### Content Structure
+- Analyze headings and structure
+- Suggest improvements
+
+### Recommendations
+- Provide specific optimization suggestions
+- Include actionable improvements
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -137,7 +152,22 @@ class TextOptimizer {
                     model: "claude-3-sonnet-20240229",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions: ${text}`
+                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
+Format your response with clear sections using markdown-style formatting:
+
+### Keywords
+- List key terms and phrases
+- Suggest additional relevant keywords
+
+### Content Structure
+- Analyze headings and structure
+- Suggest improvements
+
+### Recommendations
+- Provide specific optimization suggestions
+- Include actionable improvements
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -148,7 +178,22 @@ class TextOptimizer {
                     model: "deepseek-chat",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text for SEO optimization and provide specific suggestions: ${text}`
+                        content: `Analyze this text for SEO optimization and provide specific suggestions. 
+Format your response with clear sections using markdown-style formatting:
+
+### Keywords
+- List key terms and phrases
+- Suggest additional relevant keywords
+
+### Content Structure
+- Analyze headings and structure
+- Suggest improvements
+
+### Recommendations
+- Provide specific optimization suggestions
+- Include actionable improvements
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -192,7 +237,22 @@ class TextOptimizer {
                     model: "gpt-3.5-turbo",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization: ${text}`
+                        content: `Analyze this text and suggest improvements for language neutralization.
+Format your response with clear sections using markdown-style formatting:
+
+### Tone Analysis
+- Identify potentially biased language
+- Point out non-neutral expressions
+
+### Suggested Improvements
+- Provide specific neutral alternatives
+- List recommended changes
+
+### General Recommendations
+- Offer overall improvement suggestions
+- Include best practices
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -203,7 +263,22 @@ class TextOptimizer {
                     model: "claude-3-sonnet-20240229",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization: ${text}`
+                        content: `Analyze this text and suggest improvements for language neutralization.
+Format your response with clear sections using markdown-style formatting:
+
+### Tone Analysis
+- Identify potentially biased language
+- Point out non-neutral expressions
+
+### Suggested Improvements
+- Provide specific neutral alternatives
+- List recommended changes
+
+### General Recommendations
+- Offer overall improvement suggestions
+- Include best practices
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -214,7 +289,22 @@ class TextOptimizer {
                     model: "deepseek-chat",
                     messages: [{
                         role: "user",
-                        content: `Analyze this text and suggest improvements for language neutralization: ${text}`
+                        content: `Analyze this text and suggest improvements for language neutralization.
+Format your response with clear sections using markdown-style formatting:
+
+### Tone Analysis
+- Identify potentially biased language
+- Point out non-neutral expressions
+
+### Suggested Improvements
+- Provide specific neutral alternatives
+- List recommended changes
+
+### General Recommendations
+- Offer overall improvement suggestions
+- Include best practices
+
+Text to analyze: ${text}`
                     }]
                 };
                 break;
@@ -242,8 +332,13 @@ class TextOptimizer {
     }
 
     displayResults(seoResults, languageResults) {
-        this.seoSuggestions.innerHTML = `<p>${seoResults}</p>`;
-        this.languageSuggestions.innerHTML = `<p>${languageResults}</p>`;
+        // Format and display SEO suggestions
+        const formattedSeoResults = this.formatSuggestions(seoResults);
+        this.seoSuggestions.innerHTML = `<div class="suggestion-content">${formattedSeoResults}</div>`;
+        
+        // Format and display language suggestions
+        const formattedLanguageResults = this.formatSuggestions(languageResults);
+        this.languageSuggestions.innerHTML = `<div class="suggestion-content">${formattedLanguageResults}</div>`;
         
         // Generate optimized text based on suggestions
         this.generateOptimizedText();
@@ -402,6 +497,42 @@ class TextOptimizer {
         } catch(e) {
             return '';
         }
+    }
+
+    // Add new method to format suggestions
+    formatSuggestions(text) {
+        if (!text) return '';
+
+        // Convert markdown-style lists to HTML
+        let formatted = text
+            // Convert numbered lists (1. 2. etc)
+            .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+            // Convert bullet points (* or -)
+            .replace(/^[\*\-]\s+(.+)$/gm, '<li>$1</li>')
+            // Wrap consecutive list items in ul tags
+            .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+            // Convert markdown headings (### or ##)
+            .replace(/^###?\s+(.+)$/gm, '<h3>$1</h3>')
+            // Convert double newlines to paragraph breaks
+            .replace(/\n\n/g, '</p><p>')
+            // Convert single newlines to line breaks
+            .replace(/\n/g, '<br>');
+
+        // Wrap in paragraph tags if not already wrapped
+        if (!formatted.startsWith('<')) {
+            formatted = `<p>${formatted}</p>`;
+        }
+
+        // Add section dividers for better organization
+        formatted = formatted
+            .replace(/<h3>/g, '</div><div class="suggestion-section"><h3>')
+            .replace(/^/, '<div class="suggestion-section">')
+            .replace(/$/, '</div>');
+
+        // Clean up any empty sections
+        formatted = formatted.replace(/<div class="suggestion-section"><\/div>/g, '');
+
+        return formatted;
     }
 }
 
