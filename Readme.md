@@ -2,6 +2,8 @@
 
 A web-based tool that helps optimize text content for SEO and natural language improvements using AI.
 
+![Screenshot](./screenshot1.png)
+
 ## Features
 
 ### SEO Optimization
