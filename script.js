@@ -357,7 +357,6 @@ Text to analyze: ${text}`
         localStorage.setItem('apiKey', this.encrypt(apiKey));
         localStorage.setItem('aiProvider', provider);
         alert('Configuration saved successfully!');
-        this.handleNavigation({ preventDefault: () => {} }, 'main');
     }
 
     loadApiKey() {
