@@ -86,4 +86,3 @@ Each provider requires its own API key and has specific request/response formats
 - Basic encryption is used for stored credentials
 - No server-side components required
 - All API calls are made directly from the browser
-- ...
